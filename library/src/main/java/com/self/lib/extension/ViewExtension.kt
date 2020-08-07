@@ -121,10 +121,10 @@ fun View.addTouchShake() {
 /**
  * 将一个控件的enable与其它几个文本控件关联
  */
-fun View.bindEnableWith(vararg view: TextView) {
+fun View.bindEnableWith(vararg view: TextView, additional:(()->Boolean)? = null) {
     view.forEach { v ->
         v.doOnTextChanged { _, _, _, _ ->
-            this.isEnabled = view.none { it.text().isBlank() }
+            this.isEnabled = view.none { it.text().isBlank() } && (additional?.invoke()?:true)
         }
     }
 }
