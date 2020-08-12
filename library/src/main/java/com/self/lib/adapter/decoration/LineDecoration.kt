@@ -35,18 +35,21 @@ class LineDecoration(
     private var startPosition = 0
     private var endPosition = -1
 
-    fun setDrawAtLast(drawAtLast: Boolean) {
+    fun setDrawAtLast(drawAtLast: Boolean): LineDecoration {
         mDrawAtLast = drawAtLast
+        return this
     }
 
-    fun setStartPosition(startPosition: Int) {
-        if (startPosition < 0) return
+    fun setStartPosition(startPosition: Int): LineDecoration {
+        if (startPosition < 0) return this
         this.startPosition = startPosition
+        return this
     }
 
-    fun setEndPosition(endPosition: Int) {
-        if (endPosition < 0) return
+    fun setEndPosition(endPosition: Int): LineDecoration {
+        if (endPosition < 0) return this
         this.endPosition = endPosition
+        return this
     }
 
     override fun getItemOffsets(
@@ -63,7 +66,7 @@ class LineDecoration(
         }
 
         //最后一项不绘制
-        if (position == parent.adapter?.itemCount ?: 0 - 1 && !mDrawAtLast) return
+        if (position == (parent.adapter?.itemCount ?: 0) - 1 && !mDrawAtLast) return
 
         var orientation = 0
         when (val layoutManager = parent.layoutManager) {
@@ -116,7 +119,7 @@ class LineDecoration(
                 continue
             }
             //最后一项不绘制
-            if (position == parent.adapter?.itemCount ?: 0 - 1 && !mDrawAtLast) continue
+            if (position == (parent.adapter?.itemCount ?: 0) - 1 && !mDrawAtLast) continue
 
             if (orientation == OrientationHelper.VERTICAL) {
                 val params = child.layoutParams as LayoutParams

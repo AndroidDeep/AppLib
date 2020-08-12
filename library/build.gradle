@@ -50,7 +50,8 @@ dependencies {
     api 'androidx.navigation:navigation-ui-ktx:2.3.0'
     api 'androidx.recyclerview:recyclerview:1.2.0-alpha05'
     api 'androidx.viewpager2:viewpager2:1.1.0-alpha01'
-    api 'androidx.paging:paging-runtime-ktx:3.0.0-alpha04'
+    //noinspection GradleDependency
+    api 'androidx.paging:paging-runtime-ktx:3.0.0-alpha03'
 
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
