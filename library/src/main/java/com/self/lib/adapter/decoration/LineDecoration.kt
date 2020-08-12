@@ -30,7 +30,7 @@ class LineDecoration(
     private var mPaddingLeft = paddingLeft
     private var mPaddingRight = paddingRight
 
-    private var mDrawAtLast = true
+    private var mDrawAtLast = false
 
     private var startPosition = 0
     private var endPosition = -1

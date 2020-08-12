@@ -5,7 +5,9 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.text.Html
 import android.text.SpannableStringBuilder
+import android.util.Base64
 import splitties.systemservices.clipboardManager
+import java.io.UnsupportedEncodingException
 
 /**
  *
@@ -34,4 +36,21 @@ fun CharSequence.encryptPhone() : String?{
  */
 fun CharSequence.copyToClipBoard(){
     clipboardManager.setPrimaryClip(ClipData.newPlainText("text",this))
+}
+
+/**
+ * 字符串Base64编码
+ * @receiver CharSequence  目标字符串
+ * @return String?   编码字符串
+ */
+fun CharSequence.encodeBase64():String?{
+    val data: ByteArray
+    var base64:String? = null
+    try {
+        data = this.toString().toByteArray(charset("UTF-8"))
+        base64 = Base64.encodeToString(data, Base64.DEFAULT)
+    } catch (e: UnsupportedEncodingException) {
+        e.printStackTrace()
+    }
+    return base64
 }
