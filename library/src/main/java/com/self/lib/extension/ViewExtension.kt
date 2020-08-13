@@ -9,7 +9,6 @@ import android.os.Build.VERSION_CODES
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.MeasureSpec
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.annotation.Px
