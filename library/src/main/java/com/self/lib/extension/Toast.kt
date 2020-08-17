@@ -91,6 +91,10 @@ inline fun View.longToast(@StringRes msgResId: Int, @GravityFlag gravity: Int? =
 
 inline fun longToast(@StringRes msgResId: Int, @GravityFlag gravity: Int? = mGravity) = appCtx.longToast(msgResId,gravity)
 
+inline fun setToastGravity(@GravityFlag gravity: Int){
+    mGravity = gravity
+}
+
 /**
  * Avoids [WindowManager.BadTokenException] on API 25.
  */

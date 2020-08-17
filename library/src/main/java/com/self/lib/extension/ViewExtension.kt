@@ -68,7 +68,10 @@ inline var View.endPadding: Int
  * =================================================================================
  */
 
-inline fun View.onClick(crossinline block: () -> Unit) = setOnClickListener { block() }
+inline fun View.onClick(crossinline block: () -> Unit) = setOnClickListener {
+    if(it.isClickable)
+        block()
+}
 
 inline fun View.onLongClick(
     consume: Boolean = true,
