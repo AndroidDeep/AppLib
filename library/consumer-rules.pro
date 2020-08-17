@@ -1,2 +1,2 @@
--keep class androidx.lifecycle** { *; }
--keep class androidx.arch.core** { *; }
+#-keep class androidx.lifecycle** { *; }
+#-keep class androidx.arch.core** { *; }
