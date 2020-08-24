@@ -12,12 +12,6 @@ import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import kotlin.text.Charsets.UTF_8
 
-/**
- * 字符串拓展
- * @author MBP
- * @date 2020/7/27
- */
-
 fun CharSequence.toEditable() = SpannableStringBuilder(this)
 
 fun CharSequence.toHtml():CharSequence = if (VERSION.SDK_INT >= VERSION_CODES.N) {

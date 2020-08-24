@@ -8,12 +8,6 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import java.lang.reflect.Type
 
-/**
- *
- * @author MBP
- * @date 2020/7/16
- */
-
 class IntegerDefault0Adapter : JsonSerializer<Int>, JsonDeserializer<Int> {
 
     override fun serialize(src: Int?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {

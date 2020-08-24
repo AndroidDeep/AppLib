@@ -40,8 +40,8 @@ dependencies {
 
     api 'androidx.core:core-ktx:1.5.0-alpha01'
     api 'androidx.appcompat:appcompat:1.3.0-alpha01'
-    api 'androidx.constraintlayout:constraintlayout:2.0.0-rc1'
-    api 'androidx.fragment:fragment-ktx:1.3.0-alpha07'
+    api 'androidx.constraintlayout:constraintlayout:2.0.0'
+    api 'androidx.fragment:fragment-ktx:1.3.0-alpha08'
     api 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     api "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
     api "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
@@ -50,8 +50,6 @@ dependencies {
     api 'androidx.navigation:navigation-ui-ktx:2.3.0'
     api 'androidx.recyclerview:recyclerview:1.2.0-alpha05'
     api 'androidx.viewpager2:viewpager2:1.1.0-alpha01'
-    //noinspection GradleDependency
-    api 'androidx.paging:paging-runtime-ktx:3.0.0-alpha03'
 
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
@@ -66,6 +64,11 @@ dependencies {
 
     api "com.louiscad.splitties:splitties-appctx:$splittiesVersion"
     api "com.louiscad.splitties:splitties-systemservices:$splittiesVersion"
+
+    implementation 'com.google.zxing:core:3.4.0'
+
+    //noinspection GradleDependency
+    api 'androidx.paging:paging-runtime-ktx:3.0.0-alpha03'
 
 }
 

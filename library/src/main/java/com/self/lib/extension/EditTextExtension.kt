@@ -10,12 +10,6 @@ import androidx.core.widget.doOnTextChanged
 import splitties.systemservices.inputMethodManager
 import java.util.regex.Pattern
 
-/**
- *
- * @author MBP
- * @date 2020/7/13
- */
-
 fun EditText.setClearIconView(icon: ImageView) {
     setOnFocusChangeListener { _, hasFocus ->
         if (hasFocus) {

@@ -28,11 +28,6 @@ import java.io.File
 import java.io.IOException
 import java.io.OutputStream
 
-/**
- * 图像工具类
- * @author MBP
- * @date 2020/7/11
- */
 object ImageUtil {
 
     /**

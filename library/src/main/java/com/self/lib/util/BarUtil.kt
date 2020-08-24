@@ -22,19 +22,19 @@ object BarUtil {
     ///////////////////////////////////////////////////////////////////////////
     // 状态栏
 
-    private var statuBarHeight: Int = 0
+    private var statusBarHeight: Int = 0
 
     /**
      * 获取状态栏高度
      */
     @JvmStatic
     fun getStatusBarHeight(): Int {
-        if (statuBarHeight == 0) {
+        if (statusBarHeight == 0) {
             val resources = appCtx.resources
             val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-            statuBarHeight = resources.getDimensionPixelSize(resourceId)
+            statusBarHeight = resources.getDimensionPixelSize(resourceId)
         }
-        return statuBarHeight
+        return statusBarHeight
     }
 
     /**
@@ -75,17 +75,20 @@ object BarUtil {
     ///////////////////////////////////////////////////////////////////////////
     // 导航栏
 
+    private var navigationBarHeight: Int = 0
+
     /**
      * 获取导航栏高度
      */
     fun getNavBarHeight(): Int {
-        val res = appCtx.resources
-        val resourceId = res.getIdentifier("navigation_bar_height", "dimen", "android")
-        return if (resourceId != 0) {
-            res.getDimensionPixelSize(resourceId)
-        } else {
-            0
+        if (navigationBarHeight == 0) {
+            val res = appCtx.resources
+            val resourceId = res.getIdentifier("navigation_bar_height", "dimen", "android")
+            if (resourceId != 0) {
+                navigationBarHeight = res.getDimensionPixelSize(resourceId)
+            }
         }
+        return navigationBarHeight
     }
 
     /**
@@ -167,5 +170,4 @@ object BarUtil {
         display.getRealSize(realSize)
         return realSize.y != size.y || realSize.x != size.x
     }
-
 }

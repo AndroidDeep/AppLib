@@ -8,12 +8,6 @@ import androidx.annotation.NonNull
 import splitties.init.appCtx
 import splitties.systemservices.windowManager
 
-/**
- *
- * @author MBP
- * @date 2019-11-16
- */
-
 object ScreenUtil {
 
     private val wm = appCtx.windowManager

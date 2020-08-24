@@ -3,12 +3,6 @@ package com.self.lib.extension
 import java.math.RoundingMode.HALF_EVEN
 import java.text.DecimalFormat
 
-/**
- * 数字类拓展
- * @author MBP
- * @date 2020/8/3
- */
-
 fun Number.toDecimal2(): String {
     val df = DecimalFormat("0.00")
     df.roundingMode = HALF_EVEN

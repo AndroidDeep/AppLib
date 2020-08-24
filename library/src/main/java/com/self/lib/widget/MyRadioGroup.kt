@@ -12,8 +12,6 @@ import androidx.annotation.IdRes
 
 /**
  * 可以实现任意嵌套RadioButton
- * @author mbp
- * ate 2018/10/8
  */
 class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: AttributeSet? = null,
     defStyle: Int = 0,defStyleRes:Int = 0) : LinearLayout(mContext,attrs,defStyle,defStyleRes) {

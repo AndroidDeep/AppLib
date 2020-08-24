@@ -16,12 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.self.lib.util.BarUtil
 
-/**
- *
- * @author MBP
- * @date 2020/7/6
- */
-
 inline val View.isLtr get() = layoutDirection == View.LAYOUT_DIRECTION_LTR
 
 inline val View.isRtl get() = !isLtr
@@ -94,11 +88,28 @@ fun View.addRippleForeground() {
 }
 
 /**
- * View的顶部添加状态栏空间，一般用于沉浸状态栏之后
+ * View的顶部添加状态栏空间，一般用于全屏沉浸之后
  */
 fun View.addStatusBarPadding() {
     topPadding = paddingTop + BarUtil.getStatusBarHeight()
     invalidate()
+}
+
+/**
+ * View的底部添加导航栏控件，一般用于全屏沉浸之后
+ */
+fun View.addNavigationBarPadding(){
+    bottomPadding = paddingBottom + BarUtil.getNavBarHeight()
+    invalidate()
+}
+
+/**
+ * 为View添加适配窗口的视图，用于全屏沉浸后调用
+ * @receiver View
+ */
+fun View.fitSystemWindow(){
+    addStatusBarPadding()
+    addNavigationBarPadding()
 }
 
 /**

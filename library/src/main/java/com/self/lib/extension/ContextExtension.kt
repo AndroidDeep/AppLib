@@ -10,12 +10,6 @@ import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 
 /**
- *
- * @author MBP
- * @date 2019-09-11
- */
-
-/**
  * 从资源中获取颜色
  */
 fun Context.getColorRes(@ColorRes color:Int) = ContextCompat.getColor(this,color)

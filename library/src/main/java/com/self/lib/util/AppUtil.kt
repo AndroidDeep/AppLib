@@ -2,7 +2,7 @@ package com.self.lib.util
 
 import android.app.ActivityManager
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.net.Uri
 import android.os.Process
 import android.provider.Settings
@@ -16,11 +16,11 @@ object AppUtil{
      * 获取版本名
      */
     @JvmStatic
-    fun getAppVersionName(): String? {
+    fun getAppVersionName(packageName: String? = null): String? {
         return try {
-            val pi = appCtx.packageManager.getPackageInfo(appCtx.packageName, 0)
+            val pi = appCtx.packageManager.getPackageInfo(packageName ?: appCtx.packageName, 0)
             pi?.versionName
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: NameNotFoundException) {
             e.printStackTrace()
             null
         }
@@ -30,14 +30,28 @@ object AppUtil{
      * 获取版本号
      */
     @JvmStatic
-    fun getAppVersionCode() : Int{
+    fun getAppVersionCode(packageName: String? = null) : Int{
         return try {
-            val pi = appCtx.packageManager.getPackageInfo(appCtx.packageName, 0)
+            val pi = appCtx.packageManager.getPackageInfo(packageName ?: appCtx.packageName, 0)
             @Suppress("DEPRECATION")
             pi?.versionCode ?: 0
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: NameNotFoundException) {
             e.printStackTrace()
             0
+        }
+    }
+
+    /**
+     * 获取app名字
+     */
+    fun getAppName(packageName: String? = null): String? {
+        return try {
+            appCtx.packageManager.run {
+                getApplicationLabel(getApplicationInfo(packageName ?: appCtx.packageName, 0)).toString()
+            }
+        } catch (e: NameNotFoundException) {
+            e.printStackTrace()
+            null
         }
     }
 
