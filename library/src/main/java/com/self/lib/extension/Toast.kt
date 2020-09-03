@@ -95,6 +95,8 @@ inline fun setToastGravity(@GravityFlag gravity: Int){
     mGravity = gravity
 }
 
+inline fun cancelAllToast() = mToast?.cancel()
+
 /**
  * Avoids [WindowManager.BadTokenException] on API 25.
  */
