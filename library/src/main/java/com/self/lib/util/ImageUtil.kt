@@ -1,32 +1,12 @@
 package com.self.lib.util
 
-import android.Manifest.permission
-import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat
-import android.graphics.Bitmap.CompressFormat.JPEG
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Environment
 import android.provider.MediaStore.Images.Media
-import android.provider.MediaStore.MediaColumns.DATA
-import android.provider.MediaStore.MediaColumns.DATE_ADDED
-import android.provider.MediaStore.MediaColumns.DATE_MODIFIED
-import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
-import android.provider.MediaStore.MediaColumns.IS_PENDING
-import android.provider.MediaStore.MediaColumns.MIME_TYPE
-import android.provider.MediaStore.MediaColumns.RELATIVE_PATH
-import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.core.content.contentValuesOf
-import com.self.lib.extension.logError
-import splitties.init.appCtx
-import java.io.File
-import java.io.IOException
-import java.io.OutputStream
 
 object ImageUtil {
 
