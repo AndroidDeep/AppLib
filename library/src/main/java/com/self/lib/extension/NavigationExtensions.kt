@@ -39,6 +39,7 @@ fun BottomNavigationView.setupWithNavController(
     fragmentManager: FragmentManager,
     containerId: Int,
     intent: Intent,
+    beforeItemSelect: ((MenuItem)->Boolean)? = null,
     itemSelectedCallBack:((MenuItem)->Unit)? = null
 ): LiveData<NavController> {
 
@@ -92,6 +93,11 @@ fun BottomNavigationView.setupWithNavController(
         if (fragmentManager.isStateSaved) {
             false
         } else {
+            //根据判断选择是否继续更换选中
+            if(beforeItemSelect?.invoke(item) == false){
+                return@setOnNavigationItemSelectedListener false
+            }
+
             val newlySelectedItemTag = graphIdToTagMap[item.itemId]
             if (selectedItemTag != newlySelectedItemTag) {
                 // Pop everything above the first fragment (the "fixed start destination")

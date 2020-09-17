@@ -7,6 +7,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.Bitmap.CompressFormat.JPEG
+import android.graphics.Bitmap.CompressFormat.PNG
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -16,6 +18,7 @@ import android.provider.MediaStore.Images.Media
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import splitties.init.appCtx
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.OutputStream
@@ -165,3 +168,26 @@ private fun getExistingImageUriOrNull(contentUri:Uri,contentValues:ContentValues
 }
 
 fun Bitmap?.isEmpty() = this == null || width == 0 || height == 0
+
+fun Bitmap.toByteArray(needRecycle: Boolean = true):ByteArray{
+    val output = ByteArrayOutputStream()
+    compress(PNG, 100, output)
+    if (needRecycle) {
+        recycle()
+    }
+    val result = output.toByteArray()
+    try {
+        output.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return result
+}
+
+fun Bitmap.compress(format: CompressFormat,quality: Int):Bitmap{
+    val output = ByteArrayOutputStream()
+    compress(format, quality, output)
+    recycle()
+    val byteArray = output.toByteArray()
+    return BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
+}
