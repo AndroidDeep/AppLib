@@ -65,9 +65,21 @@ fun Context.makeCall(number: String): Boolean {
     }
 }
 
-fun Context.sendSMS(number: String?, text: String): Boolean {
+fun Context.sendSMSToNumber(number: String, text: String): Boolean {
     return try {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("sms:$number"))
+        intent.putExtra("sms_body", text)
+        startActivity(intent)
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+}
+
+fun Context.sendSMS(text: String): Boolean {
+    return try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("sms:"))
         intent.putExtra("sms_body", text)
         startActivity(intent)
         true

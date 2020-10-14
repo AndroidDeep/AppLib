@@ -1,20 +1,25 @@
 package com.self.lib.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.RadioButton
-import androidx.annotation.IdRes
+import java.util.ArrayList
 
 /**
- * 可以实现任意嵌套RadioButton
+ * @date 2020/10/12
  */
-class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: AttributeSet? = null,
-    defStyle: Int = 0,defStyleRes:Int = 0) : LinearLayout(mContext,attrs,defStyle,defStyleRes) {
+class MyRadioGroup @JvmOverloads constructor(
+    mContext: Context, attrs: AttributeSet? = null,
+    defStyle: Int = 0, defStyleRes: Int = 0
+)  : LinearLayout(mContext, attrs, defStyle, defStyleRes) {
 
     /**
      *
@@ -22,14 +27,13 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      * Upon empty selection, the returned value is -1.
      *
      * @return the unique id of the selected radio button in this group
-     * @attr ref android.R.styleable#RadioGroup_checkedButton
+     *
      * @see .check
      * @see .clearCheck
+     * @attr ref android.R.styleable#MyRadioGroup_checkedButton
      */
     // holds the checked id; the selection is empty by default
-    @get:IdRes
-    var checkedRadioButtonId = -1
-        private set
+    private var mCheckedId = -1
 
     // tracks children radio buttons checked state
     private var mChildOnCheckedChangeListener: CompoundButton.OnCheckedChangeListener? = null
@@ -37,7 +41,7 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
     // when true, mOnCheckedChangeListener discards events
     private var mProtectFromCheckedChange = false
     private var mOnCheckedChangeListener: OnCheckedChangeListener? = null
-    private lateinit var mPassThroughListener: PassThroughHierarchyChangeListener
+    private var mPassThroughListener: PassThroughHierarchyChangeListener? = null
 
     init {
         init()
@@ -54,45 +58,60 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      */
     override fun setOnHierarchyChangeListener(listener: OnHierarchyChangeListener) {
         // the user listener is delegated to our pass-through listener
-        mPassThroughListener.mOnHierarchyChangeListener = listener
+        mPassThroughListener?.mOnHierarchyChangeListener = listener
     }
 
     /**
-     * {@inheritDoc}
+     * set the default checked radio button, without notification the listeners
+     * @param id the default checked radio button's id, if none use -1
      */
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-
-        // checks the appropriate radio button as requested in the XML file
-        if (checkedRadioButtonId != -1) {
-            mProtectFromCheckedChange = true
-            setCheckedStateForView(checkedRadioButtonId, true)
-            mProtectFromCheckedChange = false
-            setCheckedId(checkedRadioButtonId)
+    fun setCheckWithoutNotIf(id: Int) {
+        if (id != -1 && id == mCheckedId) {
+            return
         }
-    }
-
-    private fun setViewState(child: View) {
-        if (child is RadioButton) {
-            val button = child
-            if (button.isChecked) {
-                mProtectFromCheckedChange = true
-                if (checkedRadioButtonId != -1) {
-                    setCheckedStateForView(checkedRadioButtonId, false)
-                }
-                mProtectFromCheckedChange = false
-                setCheckedId(button.id)
-            }
-        } else if (child is ViewGroup) {
-            for (i in 0 until child.childCount) {
-                setViewState(child.getChildAt(i))
-            }
+        mProtectFromCheckedChange = true
+        if (mCheckedId != -1) {
+            setCheckedStateForView(mCheckedId, false)
         }
+        if (id != -1) {
+            setCheckedStateForView(id, true)
+        }
+        mCheckedId = id
+        mProtectFromCheckedChange = false
     }
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams) {
-        setViewState(child)
+        val btns = getAllRadioButton(child)
+        if (btns.isNotEmpty()) {
+            for (button in btns) {
+                if (button.isChecked) {
+                    mProtectFromCheckedChange = true
+                    if (mCheckedId != -1) {
+                        setCheckedStateForView(mCheckedId, false)
+                    }
+                    mProtectFromCheckedChange = false
+                    setCheckedId(button.id)
+                }
+            }
+        }
         super.addView(child, index, params)
+    }
+
+    /**
+     * get all radio buttons which are in the view
+     * @param child
+     */
+    private fun getAllRadioButton(child: View): List<RadioButton> {
+        val buttons: MutableList<RadioButton> = ArrayList()
+        if (child is RadioButton) {
+            buttons.add(child)
+        } else if (child is ViewGroup) {
+            val counts = child.childCount
+            for (i in 0 until counts) {
+                buttons.addAll(getAllRadioButton(child.getChildAt(i)))
+            }
+        }
+        return buttons
     }
 
     /**
@@ -102,16 +121,17 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      * such an operation is equivalent to invoking [.clearCheck].
      *
      * @param id the unique id of the radio button to select in this group
+     *
      * @see .getCheckedRadioButtonId
      * @see .clearCheck
      */
-    fun check(@IdRes id: Int) {
+    fun check(id: Int) {
         // don't even bother
-        if (id != -1 && id == checkedRadioButtonId) {
+        if (id != -1 && id == mCheckedId) {
             return
         }
-        if (checkedRadioButtonId != -1) {
-            setCheckedStateForView(checkedRadioButtonId, false)
+        if (mCheckedId != -1) {
+            setCheckedStateForView(mCheckedId, false)
         }
         if (id != -1) {
             setCheckedStateForView(id, true)
@@ -119,35 +139,25 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
         setCheckedId(id)
     }
 
-    fun check(button: RadioButton?) {
-        if (button == null) return
-        check(button.id)
-    }
-
-    private fun setCheckedId(@IdRes id: Int) {
-        checkedRadioButtonId = id
-        if (mOnCheckedChangeListener != null) {
-            mOnCheckedChangeListener!!.onCheckedChanged(this, checkedRadioButtonId)
-        }
+    private fun setCheckedId(id: Int) {
+        mCheckedId = id
+        mOnCheckedChangeListener?.onCheckedChanged(this, mCheckedId)
     }
 
     private fun setCheckedStateForView(viewId: Int, checked: Boolean) {
         val checkedView = findViewById<View>(viewId)
-        if (checkedView is RadioButton) {
+        if (checkedView != null && checkedView is RadioButton) {
             checkedView.isChecked = checked
-
-//            ViewGroup checkedParent = (ViewGroup) checkedView.getParent();
-//            if (checkedParent != null) {
-//                checkedParent.setSelected(checked);
-//            }
         }
     }
+
+    fun getCheckedRadioButtonId() = mCheckedId
 
     /**
      *
      * Clears the selection. When the selection is cleared, no radio button
      * in this group is selected and [.getCheckedRadioButtonId] returns
-     * -1.
+     * null.
      *
      * @see .check
      * @see .getCheckedRadioButtonId
@@ -163,8 +173,12 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      *
      * @param listener the callback to call on checked state change
      */
-    fun setOnCheckedChangeListener(listener: OnCheckedChangeListener?) {
-        mOnCheckedChangeListener = listener
+    fun setOnCheckedChangeListener(listener: ((checkedId:Int)->Unit)) {
+        mOnCheckedChangeListener = object : OnCheckedChangeListener {
+            override fun onCheckedChanged(group: MyRadioGroup?, checkedId: Int) {
+                listener.invoke(checkedId)
+            }
+        }
     }
 
     /**
@@ -188,8 +202,14 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
         )
     }
 
-    override fun getAccessibilityClassName(): CharSequence {
-        return MyRadioGroup::class.java.name
+    override fun onInitializeAccessibilityEvent(event: AccessibilityEvent) {
+        super.onInitializeAccessibilityEvent(event)
+        event.className = MyRadioGroup::class.java.name
+    }
+
+    override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(info)
+        info.className = MyRadioGroup::class.java.name
     }
 
     /**
@@ -198,60 +218,58 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      * the children to [.WRAP_CONTENT] when they are not specified in the
      * XML file. Otherwise, this class ussed the value read from the XML file.
      *
-     *
-     *
-     * See
-     * [Attributes][LinearLayout]
-     * for a list of all child view attributes that this class supports.
      */
     class LayoutParams : LinearLayout.LayoutParams {
 
         /**
          * {@inheritDoc}
          */
-        constructor(c: Context?, attrs: AttributeSet?) : super(c, attrs) {}
+        constructor(c: Context?, attrs: AttributeSet?) : super(c, attrs)
 
         /**
          * {@inheritDoc}
          */
-        constructor(w: Int, h: Int) : super(w, h) {}
+        constructor(w: Int, h: Int) : super(w, h)
 
         /**
          * {@inheritDoc}
          */
-        constructor(w: Int, h: Int, initWeight: Float) : super(w, h, initWeight) {}
+        constructor(w: Int, h: Int, initWeight: Float) : super(w, h, initWeight)
 
         /**
          * {@inheritDoc}
          */
-        constructor(p: ViewGroup.LayoutParams?) : super(p) {}
+        constructor(p: ViewGroup.LayoutParams?) : super(p)
 
         /**
          * {@inheritDoc}
          */
-        constructor(source: MarginLayoutParams?) : super(source) {}
+        constructor(source: MarginLayoutParams?) : super(source)
 
         /**
          *
          * Fixes the child's width to
-         * [ViewGroup.LayoutParams.WRAP_CONTENT] and the child's
-         * height to  [ViewGroup.LayoutParams.WRAP_CONTENT]
+         * [android.view.ViewGroup.LayoutParams.WRAP_CONTENT] and the child's
+         * height to  [android.view.ViewGroup.LayoutParams.WRAP_CONTENT]
          * when not specified in the XML file.
          *
-         * @param a          the styled attributes set
-         * @param widthAttr  the width attribute to fetch
+         * @param a the styled attributes set
+         * @param widthAttr the width attribute to fetch
          * @param heightAttr the height attribute to fetch
          */
-        override fun setBaseAttributes(a: TypedArray, widthAttr: Int, heightAttr: Int) {
+        override fun setBaseAttributes(
+            a: TypedArray,
+            widthAttr: Int, heightAttr: Int
+        ) {
             width = if (a.hasValue(widthAttr)) {
                 a.getLayoutDimension(widthAttr, "layout_width")
             } else {
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                WRAP_CONTENT
             }
             height = if (a.hasValue(heightAttr)) {
                 a.getLayoutDimension(heightAttr, "layout_height")
             } else {
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                WRAP_CONTENT
             }
         }
     }
@@ -261,33 +279,33 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      * Interface definition for a callback to be invoked when the checked
      * radio button changed in this group.
      */
-    interface OnCheckedChangeListener {
+    private interface OnCheckedChangeListener {
 
         /**
          *
          * Called when the checked radio button has changed. When the
          * selection is cleared, checkedId is -1.
          *
-         * @param group     the group in which the checked radio button has changed
+         * @param group the group in which the checked radio button has changed
          * @param checkedId the unique identifier of the newly checked radio button
          */
-        fun onCheckedChanged(group: MyRadioGroup?, @IdRes checkedId: Int)
+        fun onCheckedChanged(group: MyRadioGroup?, checkedId: Int)
     }
 
     private inner class CheckedStateTracker : CompoundButton.OnCheckedChangeListener {
+
         override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
             // prevents from infinite recursion
             if (mProtectFromCheckedChange) {
                 return
             }
             mProtectFromCheckedChange = true
-            if (checkedRadioButtonId != -1) {
-                setCheckedStateForView(checkedRadioButtonId, false)
+            if (mCheckedId != -1) {
+                setCheckedStateForView(mCheckedId, false)
             }
-            val id = buttonView.id
-            setCheckedStateForView(id, true)
-            setCheckedId(id)
             mProtectFromCheckedChange = false
+            val id = buttonView.id
+            setCheckedId(id)
         }
     }
 
@@ -299,13 +317,29 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
      */
     private inner class PassThroughHierarchyChangeListener : OnHierarchyChangeListener {
 
-        internal var mOnHierarchyChangeListener: OnHierarchyChangeListener? = null
+        var mOnHierarchyChangeListener: OnHierarchyChangeListener? = null
 
         /**
          * {@inheritDoc}
          */
+        @SuppressLint("NewApi")
         override fun onChildViewAdded(parent: View, child: View) {
-            setListener(child)
+            if (parent === this@MyRadioGroup) {
+                val buttons = getAllRadioButton(child)
+                if (buttons.isNotEmpty()) {
+                    for (btn in buttons) {
+                        var id = btn.id
+                        // generates an id if it's missing
+                        if (id == NO_ID) {
+                            id = generateViewId()
+                            btn.id = id
+                        }
+                        btn.setOnCheckedChangeListener(
+                            mChildOnCheckedChangeListener
+                        )
+                    }
+                }
+            }
             mOnHierarchyChangeListener?.onChildViewAdded(parent, child)
         }
 
@@ -313,56 +347,15 @@ class MyRadioGroup @JvmOverloads constructor(mContext: Context, attrs: Attribute
          * {@inheritDoc}
          */
         override fun onChildViewRemoved(parent: View, child: View) {
-            removeListener(child)
-            mOnHierarchyChangeListener?.onChildViewRemoved(parent, child)
-        }
-    }
-
-    /**
-     * 设置监听
-     *
-     * @param child
-     */
-    private fun setListener(child: View) {
-        if (child is RadioButton) {
-            var id = child.getId()
-            // generates an id if it's missing
-            if (id == View.NO_ID) {
-                id = child.hashCode()
-                child.setId(id)
-            }
-            val parent = child.getParent() as ViewGroup?
-            if (parent != null) {
-                child.setClickable(false)
-                parent.setOnClickListener(object : OnClickListener {
-                    override fun onClick(v: View) {
-                        if (child.getId() == checkedRadioButtonId) return
-                        child.isChecked = !child.isChecked
+            if (parent === this@MyRadioGroup) {
+                val buttons = getAllRadioButton(child)
+                if (buttons.isNotEmpty()) {
+                    for (btn in buttons) {
+                        btn.setOnCheckedChangeListener(null)
                     }
-                })
+                }
             }
-            child.setOnCheckedChangeListener(mChildOnCheckedChangeListener)
-        } else if (child is ViewGroup) {
-            val view = child
-            for (i in 0 until view.childCount) {
-                setListener(view.getChildAt(i))
-            }
-        }
-    }
-
-    /**
-     * 移除监听
-     *
-     * @param child
-     */
-    private fun removeListener(child: View) {
-        if (child is RadioButton) {
-            child.setOnCheckedChangeListener(null)
-        } else if (child is ViewGroup) {
-            val view = child
-            for (i in 0 until view.childCount) {
-                removeListener(view.getChildAt(i))
-            }
+            mOnHierarchyChangeListener?.onChildViewRemoved(parent, child)
         }
     }
 }

@@ -2,9 +2,11 @@ package com.self.lib.util
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import org.json.JSONException
+import java.lang.reflect.Type
 import java.util.ArrayList
 
 /**
@@ -34,6 +36,10 @@ object GsonUtil {
   @JvmStatic fun <T> parseList(json: String, cls: Class<T>): List<T> {
     val array = JsonParser.parseString(json).asJsonArray
     return array.map { gson.fromJson(it, cls) }
+  }
+
+  @JvmStatic fun <T> parseJsonElement(json: JsonElement?,typeOfT: Type?):T{
+    return gson.fromJson(json,typeOfT)
   }
 
   //下面两种方法是解析JsonArray的自己写的方法，可用new TypeToken<List<T>>(){}.getType()代替
